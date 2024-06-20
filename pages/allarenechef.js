@@ -71,7 +71,7 @@ const AreneChefPage = () => {
                     <div className="flex flex-col">
                       <img src={item.image} className='h-48 w-48 rounded-lg' />
                       <div className="flex items-center justify-between min-w-0">
-                        <h2 className="mr-auto text-red-600 text-md capitalize font-bold truncate">{item.Foodname}</h2>
+                        <h2 className="mr-auto text-red-600 text-sm font-bold capitalize font-bold truncate">{item.Foodname}</h2>
                       </div>
                     </div>
                     <div className="flex my-3 border-t border-gray-300 dark:border-gray-600"></div>
