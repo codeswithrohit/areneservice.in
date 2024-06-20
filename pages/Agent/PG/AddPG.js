@@ -181,10 +181,13 @@ const AddPG = ({ handleCloseAllInputFormats }) => {
         benefits: selectedBenefits, // Include the selected benefits
       };
 
-    
+      // Log the data just before Firestore submission
+      console.log('Data with Image URLs:', dataWithImageUrls);
+
       const db = firebase.firestore();
       const docRef = await db.collection('pgdetail').add(dataWithImageUrls);
-     
+      console.log('Document written with ID: ', docRef.id);
+
       toast.success('Submission successful!', {
         position: toast.POSITION.TOP_CENTER
       });

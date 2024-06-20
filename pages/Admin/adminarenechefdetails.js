@@ -33,7 +33,7 @@ const Billing = () => {
 
     fetchBookingDetails();
   }, [orderId]);
-
+console.log('booking',bookingData)
  
   const handlePrint = () => {
     window.print();

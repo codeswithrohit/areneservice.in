@@ -171,7 +171,10 @@ const Index = () => {
   };
   
 
-
+  // const handleEditChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setEditData({ ...editData, [name]: value });
+  // };
 
   const handleEditRoomTypeChange = (index, event) => {
     const { name, value } = event.target;

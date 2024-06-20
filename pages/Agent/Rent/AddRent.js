@@ -195,7 +195,8 @@ const AddRent = ({ handleCloseAllInputFormats }) => {
 
       const db = firebase.firestore();
       const docRef = await db.collection('rentdetail').add(dataWithImageUrls);
-   
+      console.log('Document written with ID: ', docRef.id);
+
       toast.success('Submission successful!', {
         position: toast.POSITION.TOP_CENTER
       });

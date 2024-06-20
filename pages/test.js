@@ -1,11 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 const Test = () => {
   return (
-    <div className="bg-blue-500 mt-48 text-white p-4">
-      Test
-    </div>
-  );
-};
+    <div>Test</div>
+  )
+}
 
-export default Test;
+export default Test
