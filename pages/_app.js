@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {firebase } from '../Firebase/config'
 import PreLoader from "../src/components/PreLoader";
-import "../styles/globals.css";
+import '../styles/globals.css';
 import Header1 from "../src/layouts/headers/Header1";
 import Navbar from "../components/Navbar";
 import Footer from "../src/layouts/Footer";
