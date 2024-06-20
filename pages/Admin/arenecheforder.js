@@ -32,7 +32,7 @@ const ChefOrders = () => {
         fetchBookings();
     }, []);
 
-    console.log(bookings)
+
 
     const openModal = (order) => {
         setSelectedOrder(order);

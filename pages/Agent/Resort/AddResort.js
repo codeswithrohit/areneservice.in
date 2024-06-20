@@ -181,14 +181,11 @@ const AddResort = ({handleCloseAllInputFormats}) => {
             Verified:'false'
           };
       
-          // Log the data just before Firestore submission
-          console.log('Data with Image URLs:', dataWithImageUrls);
-    
+        
     
           const db = firebase.firestore();
           const docRef = await db.collection('Resortdetail').add(dataWithImageUrls);
-          console.log('Document written with ID: ', docRef.id);
-    
+        
           toast.success('Submission successful!', {
             position: toast.POSITION.TOP_CENTER
           });

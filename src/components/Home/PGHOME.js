@@ -154,7 +154,6 @@ const PGHOME = () => {
   // Filter fetchedData based on distances less than 15 km
   const filteredData = fetchedData.filter(item => parseFloat(item.distance) < parseFloat("5000"));
 
- console.log(filteredData)
   
  const onViewMapClick = (location) => {
   window.open(`https://www.google.com/maps/search/?api=1&query=${location}`, '_blank');

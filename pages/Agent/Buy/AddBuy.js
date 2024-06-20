@@ -152,43 +152,7 @@ const AddBuy = ({handleCloseAllInputFormats}) => {
           }
         }
       };
-      
-         // Fetch all countries
-    let countryData = Country.getAllCountries();
-      
-    // Find the country object for India and set it as the default selected value
-    const indiaCountry = countryData.find((country) => country.name === 'India');
-    
-    const [stateData, setStateData] = useState();
-    const [cityData, setCityData] = useState();
-    
-    // Use India as the default selected country
-    const [country, setCountry] = useState(indiaCountry);
-    const [state, setState] = useState();
-    const [city, setCity] = useState();
-    useEffect(() => {
-      setStateData(State.getStatesOfCountry(country?.isoCode));
-    }, [country]);
-    
-    useEffect(() => {
-      setCityData(City.getCitiesOfState(country?.isoCode, state?.isoCode));
-    }, [state]);
-    
-    useEffect(() => {
-      stateData && setState(stateData.find((s) => s.name === 'Delhi'));
-    }, [stateData]);
-    
-    useEffect(() => {
-      cityData && setCity(cityData[0]);
-    }, [cityData]);
-
-    useEffect(() => {
-        console.log('Selected State:', state?.name);
-      }, [state]);
-      
-      useEffect(() => {
-        console.log('Selected City:', city?.name);
-      }, [city]);
+   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -233,7 +197,7 @@ const AddBuy = ({handleCloseAllInputFormats}) => {
 
       const db = firebase.firestore();
       const docRef = await db.collection('buydetail').add(dataWithImageUrls);
-      console.log('Document written with ID: ', docRef.id);
+     
 
       toast.success('Submission successful!', {
         position: toast.POSITION.TOP_CENTER
