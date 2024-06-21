@@ -3,6 +3,7 @@ import React, { useState,useEffect } from "react";
 import { About, Blog, Contact, Home, Listing, Pages } from "./Menu";
 import { firebase } from "../../Firebase/config";
 import { FaUser, FaShoppingCart } from "react-icons/fa"; // Import the cart icon
+import { BiShoppingBag } from 'react-icons/bi';
 const MobileMenu = () => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -78,7 +79,7 @@ const MobileMenu = () => {
     activeLi = (value) =>
       value === activeMenu ? { display: "block" } : { display: "none" };
   return (
-    <header className="header-area header-area-one d-xl-none">
+    <header className="header-area header-area-one d-xl-none mb-36 ">
     
       <div className="header-navigation sticky breakpoint-on">
         <div className="container-fluid">

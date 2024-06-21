@@ -169,9 +169,17 @@ const HomePage = () => {
   };
   if (!isLoaded) {
     return (
-      <div className='flex min-h-screen justify-center item-center'>
-      <h1>Loading...</h1>
-      </div>
+      <div className="flex justify-center items-center h-screen">
+      <button type="button"
+        className="px-6 py-2.5 rounded-full text-white text-sm tracking-wider font-semibold border-none outline-none bg-[#43d3b0] hover:bg-orange-700 active:bg-[#43d3b0]">
+        Loading
+        <svg xmlns="http://www.w3.org/2000/svg" width="18px" fill="#fff" className="ml-2 inline animate-spin" viewBox="0 0 24 24">
+          <path fillRule="evenodd"
+            d="M7.03 2.757a1 1 0 0 1 1.213-.727l4 1a1 1 0 0 1 .59 1.525l-2 3a1 1 0 0 1-1.665-1.11l.755-1.132a7.003 7.003 0 0 0-2.735 11.77 1 1 0 0 1-1.376 1.453A8.978 8.978 0 0 1 3 12a9 9 0 0 1 4.874-8l-.117-.03a1 1 0 0 1-.727-1.213zm10.092 3.017a1 1 0 0 1 1.414.038A8.973 8.973 0 0 1 21 12a9 9 0 0 1-5.068 8.098 1 1 0 0 1-.707 1.864l-3.5-1a1 1 0 0 1-.557-1.517l2-3a1 1 0 0 1 1.664 1.11l-.755 1.132a7.003 7.003 0 0 0 3.006-11.5 1 1 0 0 1 .039-1.413z"
+            clipRule="evenodd" data-original="#000000" />
+        </svg> {/* You can replace this with any loading spinner component or element */}
+      </button>
+    </div>
     );
   }
 
@@ -227,14 +235,14 @@ const HomePage = () => {
         {/* Left Column - Image Slider */}
         {/* <div  >
           <div className="lg:pr-1   lg:py-4 ">
-            <img src={imageList[currentImageIndex].imageUrl} className="h-full w-full object-cover rounded-xl" alt={`Slider Image ${currentImageIndex + 1}`} />
+            <img src={imageList[currentImageIndex].imageUrl} className="h-full w-full object-cover -xl" alt={`Slider Image ${currentImageIndex + 1}`} />
           </div>
         </div>
         <div className="flex justify-center -mt-8 lg:-mt-16">
           {imageList.map((_, index) => (
             <div
               key={index}
-              className={`w-2 h-2 lg:w-4 lg:h-4 mx-1 rounded-full cursor-pointer ${index === currentImageIndex ? 'bg-white' : 'bg-gray-300'}`}
+              className={`w-2 h-2 lg:w-4 lg:h-4 mx-1 -full cursor-pointer ${index === currentImageIndex ? 'bg-white' : 'bg-gray-300'}`}
               onClick={() => handleDotClick(index)}
             />
           ))}
@@ -253,7 +261,7 @@ const HomePage = () => {
   
   <div className="relative z-10 hero-content__container flex flex-col  container mx-auto px-2 md:px-4">
     <div className="flex items-start justify-start gap-5">
-      <button className="flex items-center rounded-full h-10 px-3 text-red-600 font-bold capitalize border-2 border-white hover:scale-95 transition-all duration-300">
+      <button className="flex items-center -full h-10 px-3 text-red-600 font-bold capitalize border-2 border-white hover:scale-95 transition-all duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide mr-4 text-red-600 font-bold lucide-map-pin">
           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
           <circle cx="12" cy="10" r="3"></circle>
@@ -270,11 +278,11 @@ const HomePage = () => {
     
       <section className="relative w-full h-full  mb-4">
    
-      <div className="w-full h-32 rounded-5xl md:px-32  ">
+      <div className="w-full h-32 -5xl md:px-32  ">
 
 
         
-      <div className="md:h-10 h-16 grid grid-cols-4 md:grid-cols-8 w-full gap-0">
+      <div className="md:h-10 h-36 grid grid-cols-2 md:grid-cols-8 w-full gap-0">
   <button
     className={`flex items-center justify-center text-sm border border-gray-300 ${
       activeTab === 'pg' ? 'bg-emerald-500 text-white font-bold text-md border-emerald-500' : 'font-bold text-sm bg-neutral-100 border-gray-300'
@@ -349,46 +357,68 @@ const HomePage = () => {
 
 
 
-      <div className="h-20 bg-white rounded-b-sm shadow-md lg:px-5 py-3 grid grid-cols-3 gap-5">
+<div className="md:col-span-8 md:h-auto col-span-2  md:gap-4 ">
+
      
-        {activeTab === 'pg' && (
-         <>
-         <div className="h-full w-full">
-           <select value={category} onChange={handleCategoryChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
-           {pgData.map((categoryOption, index) => (
-             <option key={index} value={categoryOption}>
-             {categoryOption}
-             </option>
-           ))}
-           </select>
-         </div>
-         <div className="h-full w-full">
-           <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-           <input   value={Location} name="Location" placeholder="Search location"
- onChange={(e) => setLocation(e.target.value)} className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
-           </Autocomplete>
-         </div>
-         <div className="h-full w-full">
-           <select  value={nearestLocation}
-       onChange={handleNearestLocationChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
-          <option value="" disabled selected>
-         Nearest location
-       </option>
-            <option value="2">Nearest 2 Km</option>
-       <option value="4">Nearest 4 Km</option>
-       <option value="6">Nearest 6 Km</option>
-       <option value="8">Nearest 8 Km</option>
-       <option value="10">Nearest 10 Km</option>
-           </select>
-         </div>
-         <button  onClick={handlePGSearch} className="text-white bg-emerald-500 font-bold text-xs  px-5 py-1 h-10 col-span-3">Search</button>
-         
-       </>
-        )}
+      {activeTab === 'pg' && (
+        <>
+          <div className="h-full w-full">
+            <select
+              value={category}
+              onChange={handleCategoryChange}
+              name=""
+              id=""
+              className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
+            >
+              {pgData.map((categoryOption, index) => (
+                <option key={index} value={categoryOption}>
+                  {categoryOption}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="h-full w-full">
+            <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+              <input
+                value={Location}
+                name="Location"
+                placeholder="Search location"
+                onChange={(e) => setLocation(e.target.value)}
+                className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
+                type="text"
+              />
+            </Autocomplete>
+          </div>
+          <div className="h-full w-full">
+            <select
+              value={nearestLocation}
+              onChange={handleNearestLocationChange}
+              name=""
+              id=""
+              className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
+            >
+              <option value="" disabled selected>
+                Nearest location
+              </option>
+              <option value="2">Nearest 2 Km</option>
+              <option value="4">Nearest 4 Km</option>
+              <option value="6">Nearest 6 Km</option>
+              <option value="8">Nearest 8 Km</option>
+              <option value="10">Nearest 10 Km</option>
+            </select>
+          </div>
+          <button
+            onClick={handlePGSearch}
+            className="text-white w-full bg-emerald-500 font-bold text-xs px-5 py-1 h-10 col-span-3"
+          >
+            Search
+          </button>
+        </>
+      )}
         {activeTab === 'buy' && (
           <>
             <div className="h-full w-full">
-              <select value={category} onChange={handleCategoryChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+              <select value={category} onChange={handleCategoryChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
               {buyData.map((categoryOption, index) => (
                 <option key={index} value={categoryOption}>
                 {categoryOption}
@@ -399,12 +429,12 @@ const HomePage = () => {
             <div className="h-full w-full">
               <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
               <input   value={Location} name="Location" placeholder="Search location"
-    onChange={(e) => setLocation(e.target.value)} className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
+    onChange={(e) => setLocation(e.target.value)} className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
               </Autocomplete>
             </div>
             <div className="h-full w-full">
               <select  value={nearestLocation}
-          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
              <option value="" disabled selected>
             Nearest location
           </option>
@@ -415,13 +445,13 @@ const HomePage = () => {
           <option value="10">Nearest 10 Km</option>
               </select>
             </div>
-            <button  onClick={handleBuySearch} className="text-white  bg-emerald-500 font-bold text-xs  px-5 py-1 h-10 col-span-3">Search</button>
+            <button  onClick={handleBuySearch} className="text-white  bg-emerald-500 font-bold text-xs w-full  px-5 py-1 h-10 col-span-3">Search</button>
           </>
         )}
         {activeTab === 'rent' && (
           <>
           <div className="h-full w-full">
-            <select value={category} onChange={handleCategoryChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+            <select value={category} onChange={handleCategoryChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
             {rentData.map((categoryOption, index) => (
               <option key={index} value={categoryOption}>
               {categoryOption}
@@ -432,12 +462,12 @@ const HomePage = () => {
           <div className="h-full w-full">
             <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
             <input   value={Location} name="Location" placeholder="Search location"
-  onChange={(e) => setLocation(e.target.value)} className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
+  onChange={(e) => setLocation(e.target.value)} className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
             </Autocomplete>
           </div>
           <div className="h-full w-full">
             <select  value={nearestLocation}
-        onChange={handleNearestLocationChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+        onChange={handleNearestLocationChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
            <option value="" disabled selected>
           Nearest location
         </option>
@@ -448,7 +478,7 @@ const HomePage = () => {
         <option value="10">Nearest 10 Km</option>
             </select>
           </div>
-          <button  onClick={handleRentSearch} className="text-white  bg-emerald-500 font-bold text-xs  px-5 py-1 h-10 col-span-3">Search</button>
+          <button  onClick={handleRentSearch} className="text-white w-full  bg-emerald-500 font-bold text-xs  px-5 py-1 h-10 col-span-3">Search</button>
         </>
         )}
         {activeTab === 'hotel' && (
@@ -457,12 +487,12 @@ const HomePage = () => {
             <div className="h-full w-full">
               <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
               <input   value={Location} name="Location" placeholder="Search location"
-    onChange={(e) => setLocation(e.target.value)} className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
+    onChange={(e) => setLocation(e.target.value)} className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
               </Autocomplete>
             </div>
             <div className="h-full w-full">
               <select  value={nearestLocation}
-          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
              <option value="" disabled selected>
             Nearest location
           </option>
@@ -474,7 +504,7 @@ const HomePage = () => {
               </select>
             </div>
             <div className="h-full w-full" >
-            <button  onClick={handleHotelSearch} className="text-white md:w-full bg-emerald-500 font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
+            <button  onClick={handleHotelSearch} className="text-white w-full bg-emerald-500 font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
             </div>
 
           </>
@@ -485,12 +515,12 @@ const HomePage = () => {
             <div className="h-full w-full">
               <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
               <input   value={Location} name="Location" placeholder="Search location"
-    onChange={(e) => setLocation(e.target.value)} className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
+    onChange={(e) => setLocation(e.target.value)} className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
               </Autocomplete>
             </div>
             <div className="h-full w-full">
               <select  value={nearestLocation}
-          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
              <option value="" disabled selected>
             Nearest location
           </option>
@@ -502,7 +532,7 @@ const HomePage = () => {
               </select>
             </div>
             <div className="h-full w-full" >
-            <button  onClick={handleBanqueetHallSearch} className="text-white md:w-full bg-emerald-500 font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
+            <button  onClick={handleBanqueetHallSearch} className="text-white w-full bg-emerald-500 font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
             </div>
 
           </>
@@ -513,12 +543,12 @@ const HomePage = () => {
             <div className="h-full w-full">
               <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
               <input   value={Location} name="Location" placeholder="Search location"
-    onChange={(e) => setLocation(e.target.value)} className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
+    onChange={(e) => setLocation(e.target.value)} className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs" type="text" />
               </Autocomplete>
             </div>
             <div className="h-full w-full">
               <select  value={nearestLocation}
-          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
+          onChange={handleNearestLocationChange} name="" id="" className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs">
              <option value="" disabled selected>
             Nearest location
           </option>
@@ -530,7 +560,7 @@ const HomePage = () => {
               </select>
             </div>
             <div className="h-full w-full" >
-            <button  onClick={handleResortSearch} className="text-white bg-emerald-500 md:w-full font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
+            <button  onClick={handleResortSearch} className="text-white bg-emerald-500 w-full font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
             </div>
 
           </>
@@ -545,7 +575,7 @@ const HomePage = () => {
         value={services}
        onChange={handleServiceChange}
         required
-        className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
+        className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
       >
         <option value="">Select Service</option>
         {/* Replace this with your list of services */}
@@ -562,11 +592,11 @@ const HomePage = () => {
           <div className="h-full w-full">
             <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
             <input   value={Location} name="Location" placeholder="Search location"
-  onChange={(e) => setLocation(e.target.value)} className="appearance-none text-xs border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" />
+  onChange={(e) => setLocation(e.target.value)} className="appearance-none text-xs border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" />
             </Autocomplete>
           </div>
           <div className="h-full w-full">
-          <button  onClick={handleLaundrySearch} className="text-white bg-emerald-500 md:w-full font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
+          <button  onClick={handleLaundrySearch} className="text-white bg-emerald-500 w-full font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
           </div>
         </>
         )}
@@ -578,7 +608,7 @@ const HomePage = () => {
         value={services}
        onChange={handleServiceChange}
         required
-        className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
+        className="appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
       >
         <option value="">Select Service</option>
         <option value="chinese">Chinese</option>
@@ -590,11 +620,11 @@ const HomePage = () => {
           <div className="h-full w-full">
             <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
             <input   value={Location} name="Location" placeholder="Search location"
-  onChange={(e) => setLocation(e.target.value)} className="appearance-none text-xs border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" />
+  onChange={(e) => setLocation(e.target.value)} className="appearance-none text-xs border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" />
             </Autocomplete>
           </div>
           <div className="h-full w-full">
-          <button  onClick={handleCloudKitchenSearch} className="text-white md:w-full bg-emerald-500 font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
+          <button  onClick={handleCloudKitchenSearch} className="text-white w-full bg-emerald-500 font-bold text-xs  px-4 py-1 h-8 col-span-3">Search</button>
           </div>
         </>
         )}
