@@ -33,7 +33,7 @@ const Signinwithemail = () => {
   };
 
   return (
-    <div className='bg-red-100'>
+    <div className='bg-[#e8f0fe]'>
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <div className="flex justify-center items-center mb-4">
           <img src="https://www.areneservices.in/public/front/images/property-logo.png" alt="Logo" className="w-20 h-20" />
@@ -42,7 +42,7 @@ const Signinwithemail = () => {
           We'll check if you have an account, and help create one if you don't.
         </p>
         <div className="w-full max-w-full">
-          <form onSubmit={handleSubmit} className="bg-opacity-70 bg-red-100 p-6">
+          <form onSubmit={handleSubmit} className="bg-opacity-70 bg-[#e8f0fe] p-6">
             <div>
               <div className="relative flex items-center">
                 <input name="email" type="email" required className="bg-transparent w-full text-sm border-b border-[#333] px-2 py-3 outline-none placeholder:text-[#333]" placeholder="Enter email" />

@@ -146,12 +146,12 @@ const Signinsinup = () => {
   
 
   return (
-      <div className=" bg-red-100">
+      <div className=" bg-[#e8f0fe]">
         <div className="flex justify-center items-center mb-4 lg:py-16">
           <img src="https://www.areneservices.in/public/front/images/property-logo.png" alt="Logo" className="w-20 h-20" />
         </div>
-        <div className="w-full lg:-mt-20 bg-red-100 flex justify-center items-center">
-          <div className="w-full max-w-md p-6 bg-red-100 ">
+        <div className="w-full lg:-mt-20 bg-[#e8f0fe] flex justify-center items-center">
+          <div className="w-full max-w-md p-6 bg-[#e8f0fe] ">
             <p className="text-center text-sm font-bold text-black mb-6 font-serif">
               We'll check if you have an account, and help create one if you don't.
             </p>
@@ -220,7 +220,7 @@ const Signinsinup = () => {
   </button>
  
   <div >
-    <a href="/signupwithemail" className="bg-white w-full md:w-80 py-2 px-4 text-black rounded focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-700 flex items-center justify-center">
+    <a href="/signinwithemail" className="bg-white w-full md:w-80 py-2 px-4 text-black rounded focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-700 flex items-center justify-center">
       <img src="email1.svg" className="w-6 h-5 mr-2" alt="Email Logo" />
       <span className="font-medium">Continue with Email</span>
     </a>
