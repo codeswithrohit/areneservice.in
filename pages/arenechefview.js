@@ -8,7 +8,8 @@ const AreneChef = () => {
     const router = useRouter();
     const [fetchedData, setFetchedData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedTenure, setSelectedTenure] = useState(0); // Initialize with null
+    const [selectedTenure, setSelectedTenure] = useState(0);
+    const [quantity, setQuantity] = useState(0);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -19,7 +20,10 @@ const AreneChef = () => {
     
         pgRef.get().then((doc) => {
             if (doc.exists) {
-                setFetchedData(doc.data());
+                const data = doc.data();
+                setFetchedData(data);
+                setQuantity(parseInt(data.Foodcharge[0].noofthalli)); // Set initial quantity to the noofthalli of the first package
+                console.log("Data", data);
             } else {
                 console.log('Document not found!');
             }
@@ -29,6 +33,7 @@ const AreneChef = () => {
 
     const handleTenureClick = (index) => {
         setSelectedTenure(index);
+        setQuantity(parseInt(fetchedData.Foodcharge[index].noofthalli)); // Set quantity to noofthalli of selected package
     };
 
     const handleBuyNow = () => {
@@ -39,8 +44,8 @@ const AreneChef = () => {
                 Foodname: fetchedData.Foodname,
                 Ingredients: fetchedData.Ingredients,
                 selectedTenure: selectedTenureData.tenure,
-                selectedPrice: selectedTenureData.price,
-                selectedNoOfThali: selectedTenureData.noofthalli,
+                selectedPrice: getCurrentPrice().toFixed(2),
+                selectedNoOfThali: quantity,
             };
 
             router.push({
@@ -50,6 +55,21 @@ const AreneChef = () => {
         }
     };
 
+    const increaseQuantity = () => {
+        setQuantity(prevQuantity => prevQuantity + 1);
+    };
+
+    const decreaseQuantity = () => {
+        setQuantity(prevQuantity => Math.max(prevQuantity - 1, parseInt(fetchedData.Foodcharge[selectedTenure].noofthalli)));
+    };
+
+    const getCurrentPrice = () => {
+        if (!fetchedData || selectedTenure === null) return 0;
+        const selectedTenureData = fetchedData.Foodcharge[selectedTenure];
+        const basePrice = parseFloat(selectedTenureData.price);
+        const baseQuantity = parseFloat(selectedTenureData.noofthalli);
+        return (basePrice / baseQuantity) * quantity;
+    };
     return (
         <div className='mt-36'>
             {isLoading ? (
@@ -97,13 +117,42 @@ const AreneChef = () => {
                                     {selectedTenure !== null && (
                                         <div className="mt-4">
                                             <p className="text-xl font-bold text-gray-800">
-                                                Price: ₹ {fetchedData.Foodcharge[selectedTenure].price}
+                                                Price: ₹ {getCurrentPrice().toFixed(2)}
                                             </p>
                                             <p className="text-xl font-bold text-gray-800">
-                                                Number of Thalis: {fetchedData.Foodcharge[selectedTenure].noofthalli}
+                                                Number of Thalis/Plate: {quantity}
                                             </p>
                                         </div>
                                     )}
+                                    
+                                    <hr className="my-6" />
+
+                                    <div>
+                                        <h3 className="text-xl font-bold text-gray-800">Quantity</h3>
+                                        <div className="flex divide-x border w-max mt-4 rounded overflow-hidden">
+                                            <button 
+                                                type="button" 
+                                                className="bg-gray-100 w-12 h-10 font-semibold" 
+                                                onClick={decreaseQuantity}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 fill-current inline" viewBox="0 0 124 124">
+                                                    <path d="M112 50H12C5.4 50 0 55.4 0 62s5.4 12 12 12h100c6.6 0 12-5.4 12-12s-5.4-12-12-12z" data-original="#000000"></path>
+                                                </svg>
+                                            </button>
+                                            <button type="button" className="bg-transparent w-12 h-10 font-semibold text-gray-800 text-lg">
+                                                {quantity}
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                className="bg-gray-800 text-white w-12 h-10 font-semibold" 
+                                                onClick={increaseQuantity}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 fill-current inline" viewBox="0 0 42 42">
+                                                    <path d="M37.059 16H26V4.941C26 2.224 23.718 0 21 0s-5 2.224-5 4.941V16H4.941C2.224 16 0 18.282 0 21s2.224 5 4.941 5H16v11.059C16 39.776 18.282 42 21 42s5-2.224 5-4.941V26h11.059C39.776 26 42 23.718 42 21s-2.224-5-4.941-5z" data-original="#000000"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
 
                                     <hr className="my-8" />
 
@@ -116,7 +165,7 @@ const AreneChef = () => {
                                         className="w-full mt-8 px-6 py-3 bg-emerald-400 hover:bg-emerald-500 text-white text-sm font-semibold rounded-md"
                                         onClick={handleBuyNow}
                                     >
-                                        Buy Now
+                                        Order Now
                                     </button>
                                 </div>
                             </div>

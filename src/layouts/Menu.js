@@ -33,7 +33,6 @@ export const Pages = () => {
   const router = useRouter();
 
   const handleClick = (subcategory) => {
-    setToggle(false);
     router.push({
       pathname: '/Allbuysubcat',
       query: { subcategory: subcategory }
@@ -74,7 +73,7 @@ export const Blog = () => {
   const router = useRouter();
 
   const handleClick = (subcategory) => {
-    setToggle(false);
+ 
     router.push({
       pathname: '/Allrentsubcat',
       query: { subcategory: subcategory }
