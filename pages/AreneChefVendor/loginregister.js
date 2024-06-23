@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { firebase } from '../../Firebase/config';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
@@ -7,23 +7,16 @@ import 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
+
 const Register = () => {
   const router = useRouter();
   const [isLoadinglogin, setisLoadinglogin] = useState(false);
-  const [passwordMatch, setPasswordMatch] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedPgType, setSelectedPgType] = useState('');
-  const [selectedRentType, setSelectedRentType] = useState('');
-  const [selectedBuyOption, setSelectedBuyOption] = useState('');
-  const [aadharCard, setAadharCard] = useState(null); // State for Aadhar Card file
-  const [panCard, setPanCard] = useState(null); // State for PAN Card file
-
+  const [aadharCard, setAadharCard] = useState(null);
+  const [panCard, setPanCard] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [activePage, setActivePage] = useState('');
 
- 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -43,7 +36,7 @@ const Register = () => {
   const fetchUserData = async (user) => {
     try {
       const db = getFirestore();
-      const userDocRef = doc(db, 'AreneChefVendor', user.uid); // Update the path to the user document
+      const userDocRef = doc(db, 'AreneChefVendor', user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
@@ -52,11 +45,8 @@ const Register = () => {
           setUserData(userData);
           router.push('/AreneChefVendor');
         } else {
-          router.push('/AreneChefVendor/loginregister'); // Redirect to the login page if the user is not an admin
+          router.push('/AreneChefVendor/loginregister');
         }
-      } else {
-        // Handle case where user data doesn't exist in Firestore
-        // You can create a new user profile or handle it based on your app's logic
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -64,64 +54,102 @@ const Register = () => {
       setIsLoading(false);
     }
   };
-  const handleUserTypeChange = (selectedType) => {
-    setUserType(selectedType);
-  };
 
   const handleAadharCardChange = (e) => {
-    setAadharCard(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size <= 51200) { // 50KB = 50 * 1024 bytes = 51200 bytes
+      setAadharCard(file);
+    } else {
+      toast.error('Aadhar Card file size must be less than or equal to 50KB.');
+    }
   };
 
   const handlePanCardChange = (e) => {
-    setPanCard(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size <= 51200) { // 50KB = 50 * 1024 bytes = 51200 bytes
+      setPanCard(file);
+    } else {
+      toast.error('PAN Card file size must be less than or equal to 50KB.');
+    }
   };
+
+  const validateEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const validateMobileNumber = (number) => {
+    const re = /^\d{10}$/;
+    return re.test(String(number));
+  };
+
   const handleSignUp = async () => {
     try {
       setisLoadinglogin(true);
       const auth = getAuth();
       const storageRef = firebase.storage().ref();
-  
-      // Upload Aadhar Card and get the download URL
-      const aadharCardRef = storageRef.child(`aadharCards/${aadharCard.name}`);
-      await aadharCardRef.put(aadharCard);
-      const aadharCardUrl = await aadharCardRef.getDownloadURL();
-  
-      // Upload PAN Card and get the download URL
-      const panCardRef = storageRef.child(`panCards/${panCard.name}`);
-      await panCardRef.put(panCard);
-      const panCardUrl = await panCardRef.getDownloadURL();
-  
-      // Get user input values
+
       const { name, email, mobileNumber, password, address, pincode } = getUserInputValues();
-  
+
       if (!name || !email || !mobileNumber || !address || !pincode || !password) {
         toast.error('All fields are required.');
         setisLoadinglogin(false);
         return;
       }
-  
-      // Get selected food types
+
+      if (!validateEmail(email)) {
+        toast.error('Invalid email address.');
+        setisLoadinglogin(false);
+        return;
+      }
+
+      if (!validateMobileNumber(mobileNumber)) {
+        toast.error('Mobile number must be a 10-digit number.');
+        setisLoadinglogin(false);
+        return;
+      }
+
+      // Upload Aadhar Card and get the download URL
+      const aadharCardRef = storageRef.child(`aadharCards/${aadharCard.name}`);
+      const aadharUploadTask = aadharCardRef.put(aadharCard);
+
+      // Upload PAN Card and get the download URL
+      const panCardRef = storageRef.child(`panCards/${panCard.name}`);
+      const panUploadTask = panCardRef.put(panCard);
+
+      // Show upload progress
+      aadharUploadTask.on('state_changed', snapshot => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(progress);
+      });
+
+      panUploadTask.on('state_changed', snapshot => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(progress);
+      });
+
+      const [aadharSnapshot, panSnapshot] = await Promise.all([aadharUploadTask, panUploadTask]);
+      const aadharCardUrl = await aadharSnapshot.ref.getDownloadURL();
+      const panCardUrl = await panSnapshot.ref.getDownloadURL();
+
       const foodTypes = getSelectedFoodTypes();
-  
-      // Prepare user data object
+
       const userData = {
-        name: name,
-        email: email,
-        mobileNumber: mobileNumber,
+        name,
+        email,
+        mobileNumber,
         isArenechef: true,
-        aadharCardUrl: aadharCardUrl,
-        panCardUrl: panCardUrl,
-        pincode: pincode,
-        address: address,
-        foodTypes: foodTypes,
+        aadharCardUrl,
+        panCardUrl,
+        pincode,
+        address,
+        foodTypes,
         verified: false
       };
-  
-      // Create user in Firebase Authentication
+
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
       await firebase.firestore().collection('AreneChefVendor').doc(user.uid).set(userData);
-      // Display success message
       toast.success('Arene Chef Vendor account has been created.');
       setisLoadinglogin(false);
     } catch (error) {
@@ -130,11 +158,9 @@ const Register = () => {
         toast.error('Email already exists.');
       } else {
         toast.error('Error signing up: ' + error.message);
-        console.log(error.message);
       }
     }
   };
-  
 
   const getUserInputValues = () => {
     const name = document.getElementById('signup-name').value;
@@ -303,14 +329,12 @@ const Register = () => {
   
 
 
-          <button
-                  type='submit'
-                  onClick={handleSignUp}
-                  disabled={isLoading}
-                  className='w-full rounded-lg bg-gray-900 px-4 py-2 text-center text-base font-semibold text-white shadow-md ring-gray-500 ring-offset-2 transition focus:ring-2'
-                >
-                    {isLoadinglogin ? 'Loading...' : 'Sign Up'}
-                </button>
+      <button type="submit"
+             onClick={handleSignUp}
+             disabled={isLoadinglogin}
+             className="w-full bg-blue-500 text-white p-2 rounded">
+              {isLoadinglogin ? `Uploading... ${uploadProgress.toFixed(2)}%` : 'Submit'}
+            </button>
   </div>
 </div>
 

@@ -81,7 +81,7 @@ const AgentNav = () => {
         <nav className="bg-white border-b">
           <div className="flex items-center space-x-8 py-3 px-4 max-w-screen-xl mx-auto md:px-8">
             <div className="flex-none lg:flex-initial">
-              <a href="javascript:void(0)">
+              <a href="/">
                 <img
                   src="https://www.areneservices.in/public/front/images/property-logo.png"
                   width={80}

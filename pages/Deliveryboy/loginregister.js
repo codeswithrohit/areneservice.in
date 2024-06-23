@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { firebase } from '../../Firebase/config';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
@@ -7,23 +7,15 @@ import 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
+
 const Register = () => {
   const router = useRouter();
   const [isLoadinglogin, setisLoadinglogin] = useState(false);
-  const [passwordMatch, setPasswordMatch] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [selectedPgType, setSelectedPgType] = useState('');
-  const [selectedRentType, setSelectedRentType] = useState('');
-  const [selectedBuyOption, setSelectedBuyOption] = useState('');
-  const [aadharCard, setAadharCard] = useState(null); // State for Aadhar Card file
-  const [panCard, setPanCard] = useState(null); // State for PAN Card file
-
+  const [aadharCard, setAadharCard] = useState(null);
+  const [panCard, setPanCard] = useState(null);
   const [user, setUser] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const [activePage, setActivePage] = useState('');
-
- 
+  const [uploadProgress, setUploadProgress] = useState(0);
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -31,94 +23,120 @@ const Register = () => {
         setUser(user);
       } else {
         setUser(null);
-        setUserData(null);
-        router.push('/Deliveryboy/loginregister'); // Redirect to the login page if the user is not authenticated
+        router.push('/Deliveryboy/loginregister');
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-
-  const handleUserTypeChange = (selectedType) => {
-    setUserType(selectedType);
-  };
-
   const handleAadharCardChange = (e) => {
-    setAadharCard(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size <= 50 * 1024) {
+      setAadharCard(file);
+    } else {
+      toast.error('Aadhar Card file size must be less than or equal to 50KB.');
+    }
   };
 
   const handlePanCardChange = (e) => {
-    setPanCard(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size <= 50 * 1024) {
+      setPanCard(file);
+    } else {
+      toast.error('PAN Card file size must be less than or equal to 50KB.');
+    }
   };
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const validateMobileNumber = (number) => {
+    const re = /^\d{10}$/;
+    return re.test(String(number));
+  };
 
   const handleSignUp = async () => {
-  try {
-    setisLoadinglogin(true);
-    const auth = getAuth();
-    const storageRef = firebase.storage().ref();
+    try {
+      const { name, email, mobileNumber, password, address, pincode } = getUserInputValues();
 
-    // Upload Aadhar Card and get the download URL
-    const aadharCardRef = storageRef.child(`aadharCards/${aadharCard.name}`);
-    await aadharCardRef.put(aadharCard);
-    const aadharCardUrl = await aadharCardRef.getDownloadURL();
+      if (!name || !email || !mobileNumber || !address || !pincode || !password) {
+        toast.error('All fields are required.');
+        setisLoadinglogin(false);
+        return;
+      }
 
-    // Upload PAN Card and get the download URL
-    const panCardRef = storageRef.child(`panCards/${panCard.name}`);
-    await panCardRef.put(panCard);
-    const panCardUrl = await panCardRef.getDownloadURL();
+      if (!validateEmail(email)) {
+        toast.error('Invalid email format.');
+        return;
+      }
 
-    // Get user input values
-    const { name, email, mobileNumber, password, address, pincode } = getUserInputValues();
+      if (!validateMobileNumber(mobileNumber)) {
+        toast.error('Mobile number must be 10 digits.');
+        return;
+      }
 
-    if (!name || !email || !mobileNumber || !address || !pincode || !password) {
-      toast.error('All fields are required.');
+      if (!aadharCard || !panCard) {
+        toast.error('Aadhar Card and PAN Card are required.');
+        return;
+      }
+
+      setisLoadinglogin(true);
+      const auth = getAuth();
+      const storageRef = firebase.storage().ref();
+
+      const uploadFile = async (file, path) => {
+        const fileRef = storageRef.child(path);
+        const uploadTask = fileRef.put(file);
+        uploadTask.on('state_changed', (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        });
+
+        await uploadTask;
+        return await fileRef.getDownloadURL();
+      };
+
+      const aadharCardUrl = await uploadFile(aadharCard, `aadharCards/${aadharCard.name}`);
+      const panCardUrl = await uploadFile(panCard, `panCards/${panCard.name}`);
+
+      let boyType = '';
+      if (selectedPgType === 'Arene laundry') {
+        boyType = 'laundry';
+      } else if (selectedPgType === 'Arene Chef') {
+        boyType = 'chef';
+      }
+
+      const userData = {
+        name,
+        email,
+        mobileNumber,
+        isDeliveryboy: true,
+        aadharCardUrl,
+        panCardUrl,
+        pincode,
+        address,
+        verified: false,
+        boyType,
+      };
+
+      const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      await firebase.firestore().collection('Deliveryboy').doc(user.uid).set(userData);
+
+      toast.success('Delivery Boy account has been created.');
       setisLoadinglogin(false);
-      return;
+    } catch (error) {
+      setisLoadinglogin(false);
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error('Email already exists.');
+      } else {
+        toast.error('Error signing up: ' + error.message);
+      }
     }
-
-    // Determine the delivery boy type based on the selected radio button
-    let boyType = '';
-    if (selectedPgType === 'Arene laundry') {
-      boyType = 'laundry';
-    } else if (selectedPgType === 'Arene Chef') {
-      boyType = 'chef';
-    }
-
-    // Prepare user data object
-    const userData = {
-      name: name,
-      email: email,
-      mobileNumber: mobileNumber,
-      isDeliveryboy: true,
-      aadharCardUrl: aadharCardUrl,
-      panCardUrl: panCardUrl,
-      pincode: pincode,
-      address: address,
-      verified: false,
-      boyType: boyType // Add the delivery boy type to the userData object
-    };
-
-    // Create user in Firebase Authentication
-    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    await firebase.firestore().collection('Deliveryboy').doc(user.uid).set(userData);
-    // Display success message
-    toast.success('Delivery Boy account has been created.');
-    setisLoadinglogin(false);
-  } catch (error) {
-    setisLoadinglogin(false);
-    if (error.code === 'auth/email-already-in-use') {
-      toast.error('Email already exists.');
-    } else {
-      toast.error('Error signing up: ' + error.message);
-      console.log(error.message);
-    }
-  }
-};
-
-  
+  };
 
   const getUserInputValues = () => {
     const name = document.getElementById('signup-name').value;
@@ -129,7 +147,6 @@ const Register = () => {
     const pincode = document.getElementById('signup-pincode').value;
     return { name, email, mobileNumber, password, address, pincode };
   };
-
 
   
 
@@ -306,14 +323,12 @@ const Register = () => {
   
 
 
-          <button
-                  type='submit'
-                  onClick={handleSignUp}
-                  disabled={isLoading}
-                  className='w-full rounded-lg bg-gray-900 px-4 py-2 text-center text-base font-semibold text-white shadow-md ring-gray-500 ring-offset-2 transition focus:ring-2'
-                >
-                    {isLoadinglogin ? 'Loading...' : 'Sign Up'}
-                </button>
+      <button type="submit"
+             onClick={handleSignUp}
+             disabled={isLoadinglogin}
+             className="w-full bg-blue-500 text-white p-2 rounded">
+              {isLoadinglogin ? `Uploading... ${uploadProgress.toFixed(2)}%` : 'Submit'}
+            </button>
   </div>
 </div>
 

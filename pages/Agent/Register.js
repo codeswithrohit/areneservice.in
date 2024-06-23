@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { firebase } from '../../Firebase/config';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
@@ -7,6 +7,7 @@ import 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
+
 const Register = () => {
   const router = useRouter();
   const [userType, setUserType] = useState('Individual');
@@ -19,6 +20,7 @@ const Register = () => {
   const [selectedBuyOption, setSelectedBuyOption] = useState('');
   const [aadharCard, setAadharCard] = useState(null); // State for Aadhar Card file
   const [panCard, setPanCard] = useState(null); // State for PAN Card file
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -27,6 +29,7 @@ const Register = () => {
   useEffect(() => {
     setActivePage(router.pathname);
   }, [router.pathname]);
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -46,7 +49,7 @@ const Register = () => {
   const fetchUserData = async (user) => {
     try {
       const db = getFirestore();
-      const userDocRef = doc(db, 'users', user.uid); // Update the path to the user document
+      const userDocRef = doc(db, 'AgentOwner', user.uid); // Update the path to the user document
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
@@ -67,16 +70,31 @@ const Register = () => {
       setIsLoading(false);
     }
   };
+
   const handleUserTypeChange = (selectedType) => {
     setUserType(selectedType);
   };
 
   const handleAadharCardChange = (e) => {
-    setAadharCard(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size <= 51200) {
+      setAadharCard(file);
+    } else {
+      toast.error('Aadhar card file size must be less than or equal to 50 KB.', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
   };
 
   const handlePanCardChange = (e) => {
-    setPanCard(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size <= 51200) {
+      setPanCard(file);
+    } else {
+      toast.error('PAN card file size must be less than or equal to 50 KB.', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
   };
 
   const handleSignUp = async () => {
@@ -95,6 +113,12 @@ const Register = () => {
   
     if (!name || !email || !mobileNumber || !password || !confirmPassword) {
       return toast.error('All fields are required.', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return toast.error('Invalid email format.', {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
@@ -124,15 +148,30 @@ const Register = () => {
       setisLoadinglogin(true);
       const storageRef = firebase.storage().ref();
   
-      // Assuming 'aadharCard' and 'panCard' are already defined or provided in the scope
+      const uploadFile = (file, path) => {
+        return new Promise((resolve, reject) => {
+          const fileRef = storageRef.child(path);
+          const uploadTask = fileRef.put(file);
+
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(progress);
+            },
+            (error) => {
+              reject(error);
+            },
+            async () => {
+              const downloadURL = await fileRef.getDownloadURL();
+              resolve(downloadURL);
+            }
+          );
+        });
+      };
   
-      const aadharCardRef = storageRef.child(`aadharCards/${aadharCard.name}`);
-      await aadharCardRef.put(aadharCard);
-      const aadharCardUrl = await aadharCardRef.getDownloadURL();
-  
-      const panCardRef = storageRef.child(`panCards/${panCard.name}`);
-      await panCardRef.put(panCard);
-      const panCardUrl = await panCardRef.getDownloadURL();
+      const aadharCardUrl = await uploadFile(aadharCard, `aadharCards/${aadharCard.name}`);
+      const panCardUrl = await uploadFile(panCard, `panCards/${panCard.name}`);
   
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
@@ -150,7 +189,6 @@ const Register = () => {
       if (userType === 'Agent') {
         userData.selectedBuyOption = selectedBuyOption;
         userData.Verified = false; // Assuming 'Verified' should be a boolean, not a string
-  
       }
   
       await firebase.firestore().collection('AgentOwner').doc(user.uid).set(userData);
@@ -222,18 +260,26 @@ const Register = () => {
               });
               router.push('/Agent')
             } else {
-              toast.error('You do not have Agent permission.', {
+              toast.error('Access denied. You are not a vendor.', {
                 position: toast.POSITION.TOP_RIGHT,
               });
+              signOut(getAuth()); // Sign out the user
+              setIsLoading(false); // Reset loading state
             }
+          })
+          .catch((error) => {
+            console.error('Error fetching user data:', error);
+            toast.error('Error logging in: ' + error.message, {
+              position: toast.POSITION.TOP_RIGHT,
+            });
             setIsLoading(false);
           });
       })
       .catch((error) => {
-        setIsLoading(false);
-        toast.error('Email & Password are Incorrect ' , {
+        toast.error('Error logging in: ' + error.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
+        setIsLoading(false);
       });
   };
 
@@ -387,14 +433,12 @@ const Register = () => {
          {isLoadinglogin ? 'Loading...' : 'Sign Up'}
           </button> */}
 
-          <button
-                  type='submit'
-                  onClick={handleSignUp}
-                  disabled={isLoading}
-                  className='w-full rounded-lg bg-gray-900 px-4 py-2 text-center text-base font-semibold text-white shadow-md ring-gray-500 ring-offset-2 transition focus:ring-2'
-                >
-                    {isLoadinglogin ? 'Loading...' : 'Sign Up'}
-                </button>
+<button type="submit"
+             onClick={handleSignUp}
+             disabled={isLoadinglogin}
+             className="w-full bg-blue-500 text-white p-2 rounded">
+              {isLoadinglogin ? `Uploading... ${uploadProgress.toFixed(2)}%` : 'Submit'}
+            </button>
   </div>
 </div>
 
